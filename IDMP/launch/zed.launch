@@ -1,0 +1,15 @@
+<launch>
+    <include file="$(find zed_wrapper)/launch/zed2i.launch"/>
+    <node name="pcl_filter" pkg="sensor_filters" type="pointcloud2_filter_chain" output="screen">
+        <rosparam command="load" file="$(find idmp_ros)/config/zedFilterChain.yaml" />
+        <remap from="~input" to="/zed2i/zed_node/point_cloud/cloud_registered" />
+        <remap from="~output" to="/points_filt" />
+    </node>
+    
+    <node pkg="tf2_ros" type="static_transform_publisher" name="zed_link" args="1.50213 0.788716 1.05359 -0.27777316 -0.06507167 0.91164947 -0.29580942 base_link zed2i_base_link" />
+   
+    
+    <rosparam file="$(find idmp_ros)/config/params_live.yaml" />
+    <node pkg="idmp_ros" type="idmp" name="idmp" output="screen" respawn="true"/> 
+
+</launch>

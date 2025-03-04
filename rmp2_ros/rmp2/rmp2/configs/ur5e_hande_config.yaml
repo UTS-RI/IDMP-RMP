@@ -1,0 +1,100 @@
+# rmp configuration of the hand-designed rmp2 policy for ur5e robot
+
+robot_name: 'ur5e_hande'
+
+eef_link: 'tcp_link'
+
+default_q: [
+    1.2454962730407715, -1.0265311163714905, 1.2176473776446741, -1.7607447109618128, -1.5743415991412562, 2.816667079925537
+]
+
+
+joint_limit_buffers: [.01, .03, .01, .01, .01, .01]
+
+rmp_params:
+    # cspace_target_rmp:
+    #     metric_scalar: 0.005
+    #     position_gain: 2.
+    #     damping_gain: 2.
+    #     robust_position_term_thresh: .5
+    #     inertia: 0.0001
+    # joint_limit_rmp:
+    #     metric_scalar: 0.1
+    #     metric_length_scale: .01
+    #     metric_exploder_eps: .001
+    #     metric_velocity_gate_length_scale: .01
+    #     accel_damper_gain: 2.
+    #     accel_potential_gain: 1.
+    #     accel_potential_exploder_length_scale: .1
+    #     accel_potential_exploder_eps: .01
+    joint_velocity_cap_rmp:
+        max_velocity: 1.7
+        velocity_damping_region: 0.15
+        damping_gain: 1.5
+        metric_weight: 0.05
+    target_rmp:
+        accel_p_gain: 0.5
+        accel_d_gain: 1
+        accel_norm_eps: .075
+        metric_alpha_length_scale: .05
+        min_metric_alpha: .03
+        max_metric_scalar: 1.5
+        min_metric_scalar: 0.2
+        proximity_metric_boost_scalar: 0.
+        proximity_metric_boost_length_scale: .02
+
+    collision_rmp:
+        margin: 0.
+        damping_gain: 0.8
+        damping_std_dev: .1
+        damping_robustness_eps: .2
+        damping_velocity_gate_length_scale: .5
+        repulsion_gain: 0.8
+        repulsion_std_dev: .1
+        metric_modulation_radius: .3
+        metric_scalar: 1
+        metric_exploder_std_dev: .02
+        metric_exploder_eps: .001
+    damping_rmp:
+        accel_d_gain: 1.
+        metric_scalar: 0.02
+        inertia: 0.
+
+body_obstacles: []
+
+arm_collision_controllers:
+    # - segment: [base_link, upper_arm_link]
+    #   name: shoulder_pan_joint
+    #   interpolation_pts: 1
+    #   radius: .1
+    # - segment: [upper_arm_link, virtual_shoulder_link]
+    #   name: shoulder_lift_joint
+    #   interpolation_pts: 5
+    #   radius: .15
+    - segment: [virtual_shoulder_link, virtual_forearm_link]
+      name: elbow_joint
+      interpolation_pts: 5
+      radius: .12
+    - segment: [forearm_link, virtual_wrist_1_link]
+      name: shoulder_lift_joint
+      interpolation_pts: 5
+      radius: .12
+    - segment: [wrist_1_link, wrist_2_link]
+      name: wrist_2_joint
+      interpolation_pts: 2
+      radius: .10
+    - segment: [wrist_2_link, wrist_3_link]
+      name: wrist_3_joint
+      interpolation_pts: 2
+      radius: .10
+      suppression_name: [tool0,flange]
+    - segment: [tool0, hande_base_link]
+      name: hande_base_joint
+      interpolation_pts: 2
+      radius: .08
+      suppression_name: [tool0,flange]
+    - segment: [hande_base_link, tcp_link]
+      name: tcp_joint
+      interpolation_pts: 2
+      radius: .05
+      suppression_name: [tool0,flange]

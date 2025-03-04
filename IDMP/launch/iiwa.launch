@@ -1,0 +1,10 @@
+<launch>
+    <rosparam param="/iiwa/publishJointStates">True</rosparam>
+    <include file="$(find iiwa_description)/launch/iiwa14_upload.launch"/>
+    <node name="iiwa_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="joint_states" to="/iiwa/joint_states" />
+    </node>
+    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="zed_link" args="1.50213 0.788716 1.05359 -0.27777316 -0.06507167 0.91164947 -0.29580942 base_link zed2i_base_link" /> --> -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_world" args="0 0 0 0 0 0 1 base_link world" /> -->
+
+</launch>

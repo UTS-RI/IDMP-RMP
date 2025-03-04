@@ -1,0 +1,28 @@
+idmp_rleng: 1.5
+idmp_tree_hl_min: 0.01
+idmp_tree_hl_max: 2.56
+idmp_tree_hl_clust: 0.02
+idmp_tree_hl_init: 1.28
+idmp_map_scale: 200
+idmp_obs_skip: 10
+idmp_filt_outl: False
+
+idmp_depth_input: False
+idmp_dual_cam: False
+idmp_pub_pcl: True
+idmp_depth_topic: "/camera_1/depth/image_raw"
+idmp_dual_depth_topic: ""
+idmp_world_frame: "base_link"
+idmp_pcl_topic: "/points_filt"
+idmp_caminfo_topic: 
+  # - ["/depth/camera_info", "rgb_camera_link"]
+  - ["/kinect_right/depth/camera_info", "right_depth_camera_link"]
+  - ["/kinect_left/depth/camera_info", "left_depth_camera_link"]
+  # - ["/zed2i/zed_node/depth/camera_info", "zed2i_left_camera_optical_frame"]
+  # - ["/camera_2/depth/camera_info", "camera_2_depth_optical_frame"]
+idmp_dynamic: True
+idmp_fusion: False
+
+idmp_dyn_tresh: 0.005
+idmp_fus_min: 0.0005
+idmp_fus_max: 0.005

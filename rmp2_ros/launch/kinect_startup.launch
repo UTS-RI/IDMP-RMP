@@ -1,0 +1,119 @@
+<launch>
+
+    <arg name="tf_prefix_master" value="left_" />
+    <arg name="sensor_sn_master" value="000792320212" />
+    <arg name="tf_prefix_slave" value="right_" />
+    <arg name="sensor_sn_slave" value="000446720212" />
+
+    <!-- Master Kinect (Sync out) -->
+    <param name="kinect_master_description" command="xacro $(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro tf_prefix:=$(arg tf_prefix_master)" />
+    <node name="joint_state_publisher_kinect_master" pkg="joint_state_publisher" type="joint_state_publisher">
+        <remap from="robot_description" to="kinect_master_description" />
+    </node>  
+    <node name="robot_state_publisher_kinect_master" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="robot_description" to="kinect_master_description" />
+    </node>
+    <!-- Slave Kinect (Sync in) -->
+    <param name="kinect_slave_description" command="xacro $(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro tf_prefix:=$(arg tf_prefix_slave)" />
+    <node name="joint_state_publisher_kinect_slave" pkg="joint_state_publisher" type="joint_state_publisher">
+        <remap from="robot_description" to="kinect_slave_description" />
+    </node>  
+    <node name="robot_state_publisher_kinect_slave" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="robot_description" to="kinect_slave_description" />
+    </node>
+
+    <arg name="depth_enabled"           default="true" />           <!-- Enable or disable the depth camera -->
+    <arg name="depth_mode"              default="NFOV_UNBINNED" />  <!-- Set the depth camera mode, which affects FOV, depth range, and camera resolution. See Azure Kinect documentation for full details. Valid options: NFOV_UNBINNED, NFOV_2X2BINNED, WFOV_UNBINNED, WFOV_2X2BINNED, and PASSIVE_IR -->
+    <arg name="depth_unit"              default="16UC1" />          <!-- Depth distance units. Options are: "32FC1" (32 bit float metre) or "16UC1" (16 bit integer millimetre) -->
+    <arg name="color_enabled"           default="true" />           <!-- Enable or disable the color camera -->
+    <arg name="color_format"            default="bgra" />           <!-- The format of RGB camera. Valid options: bgra, jpeg -->
+    <arg name="color_resolution"        default="720P" />          <!-- Resolution at which to run the color camera. Valid options: 720P, 1080P, 1440P, 1536P, 2160P, 3072P -->
+    <arg name="fps"                     default="15" />              <!-- FPS to run both cameras at. Valid options are 5, 15, and 30 -->
+    <arg name="point_cloud"             default="true" />           <!-- Generate a point cloud from depth data. Requires depth_enabled -->
+    <arg name="rgb_point_cloud"         default="true" />           <!-- Colorize the point cloud using the RBG camera. Requires color_enabled and depth_enabled -->
+    <arg name="point_cloud_in_depth_frame" default="false" />        <!-- Whether the RGB pointcloud is rendered in the depth frame (true) or RGB frame (false). Will either match the resolution of the depth camera (true) or the RGB camera (false). -->
+    <arg name="required"                default="true" />          <!-- Argument which specified if the entire launch file should terminate if the node dies -->
+    <arg name="sensor_sn"               default="" />               <!-- Sensor serial number. If none provided, the first sensor will be selected -->
+    <arg name="recording_file"          default="" />               <!-- Absolute path to a mkv recording file which will be used with the playback api instead of opening a device -->
+    <arg name="recording_loop_enabled"  default="false" />          <!-- If set to true the recording file will rewind the beginning once end of file is reached -->
+    <arg name="body_tracking_enabled"           default="false" />  <!-- If set to true the joint positions will be published as marker arrays -->
+    <arg name="body_tracking_smoothing_factor"  default="0.0" />    <!-- Set between 0 for no smoothing and 1 for full smoothing -->
+    <arg name="rescale_ir_to_mono8"  default="false" />    <!-- Whether to rescale the IR image to an 8-bit monochrome image for visualization and further processing. A scaling factor (ir_mono8_scaling_factor) is applied. -->
+    <arg name="ir_mono8_scaling_factor"  default="1.0" />    <!-- Scaling factor to apply when converting IR to mono8 (see rescale_ir_to_mono8). If using illumination, use the value 0.5-1. If using passive IR, use 10. -->
+    <arg name="imu_rate_target" default="0"/>                       <!-- Desired output rate of IMU messages. Set to 0 (default) for full rate (1.6 kHz). --> 
+    <!-- Master -->
+    <group ns="kinect_left">
+    <node pkg="azure_kinect_ros_driver" type="node" name="kinect_master_ros_driver" output="screen" required="$(arg required)">
+        <param name="depth_enabled"                     type="bool"     value="$(arg depth_enabled)" />
+        <param name="depth_mode"                        type="string"   value="$(arg depth_mode)" />
+        <param name="depth_unit"                        type="string"   value="$(arg depth_unit)" />
+        <param name="color_enabled"                     type="bool"     value="$(arg color_enabled)" />
+        <param name="color_format"                      type="string"   value="$(arg color_format)" />
+        <param name="color_resolution"                  type="string"   value="$(arg color_resolution)" />
+        <param name="fps"                               type="int"      value="$(arg fps)" />
+        <param name="point_cloud"                       type="bool"     value="$(arg point_cloud)" />
+        <param name="rgb_point_cloud"                   type="bool"     value="$(arg rgb_point_cloud)" />
+        <param name="point_cloud_in_depth_frame"        type="bool"     value="$(arg point_cloud_in_depth_frame)" />
+        <param name="sensor_sn"                         type="string"   value="$(arg sensor_sn_master)" />
+        <param name="tf_prefix"                         type="string"   value="$(arg tf_prefix_master)" />
+        <param name="recording_file"                    type="string"   value="$(arg recording_file)" />
+        <param name="recording_loop_enabled"            type="bool"     value="$(arg recording_loop_enabled)" />
+        <param name="body_tracking_enabled"             type="bool"     value="$(arg body_tracking_enabled)" />
+        <param name="body_tracking_smoothing_factor"    type="double"   value="$(arg body_tracking_smoothing_factor)" />
+        <param name="rescale_ir_to_mono8"               type="bool"     value="$(arg rescale_ir_to_mono8)" />
+        <param name="ir_mono8_scaling_factor"           type="double"   value="$(arg ir_mono8_scaling_factor)" />
+        <param name="imu_rate_target"                   type="int"      value="$(arg imu_rate_target)"/>
+        <param name="wired_sync_mode"                   type="int"      value="1"/>
+        <param name="subordinate_delay_off_master_usec" type="int"      value="0"/>
+    </node>
+    </group>
+    <!-- Slave -->
+    <group ns="kinect_right">
+    <node pkg="azure_kinect_ros_driver" type="node" name="kinect_slave_ros_driver" output="screen" required="$(arg required)" prefix="bash -c 'sleep 1.0; $0 $@'">
+        <param name="depth_enabled"                     type="bool"     value="$(arg depth_enabled)" />
+        <param name="depth_mode"                        type="string"   value="$(arg depth_mode)" />
+        <param name="depth_unit"                        type="string"   value="$(arg depth_unit)" />
+        <param name="color_enabled"                     type="bool"     value="$(arg color_enabled)" />
+        <param name="color_format"                      type="string"   value="$(arg color_format)" />
+        <param name="color_resolution"                  type="string"   value="$(arg color_resolution)" />
+        <param name="fps"                               type="int"      value="$(arg fps)" />
+        <param name="point_cloud"                       type="bool"     value="$(arg point_cloud)" />
+        <param name="rgb_point_cloud"                   type="bool"     value="$(arg rgb_point_cloud)" />
+        <param name="point_cloud_in_depth_frame"        type="bool"     value="$(arg point_cloud_in_depth_frame)" />
+        <param name="sensor_sn"                         type="string"   value="$(arg sensor_sn_slave)" />
+        <param name="tf_prefix"                         type="string"   value="$(arg tf_prefix_slave)" />
+        <param name="recording_file"                    type="string"   value="$(arg recording_file)" />
+        <param name="recording_loop_enabled"            type="bool"     value="$(arg recording_loop_enabled)" />
+        <param name="body_tracking_enabled"             type="bool"     value="$(arg body_tracking_enabled)" />
+        <param name="body_tracking_smoothing_factor"    type="double"   value="$(arg body_tracking_smoothing_factor)" />
+        <param name="rescale_ir_to_mono8"               type="bool"     value="$(arg rescale_ir_to_mono8)" />
+        <param name="ir_mono8_scaling_factor"           type="double"   value="$(arg ir_mono8_scaling_factor)" />
+        <param name="imu_rate_target"                   type="int"      value="$(arg imu_rate_target)"/>
+        <param name="wired_sync_mode"                   type="int"      value="2"/>
+        <param name="subordinate_delay_off_master_usec" type="int"      value="160"/>
+    </node>
+    </group>
+
+    <!-- Launch PointCloud2 concatenator node -->
+    <node pkg="pointcloud_concatenate" type="pointcloud_concatenate_node" name="pc_concat" output="screen">
+        <param name="target_frame" value="base_link" />    
+        <param name="clouds" value="2" />
+        <param name="hz" value="10" />
+        <remap from="cloud_in1" to="/kinect_left/points2" />
+        <remap from="cloud_in2" to="/kinect_right/points2" />
+        <remap from="cloud_out" to="/kinect/merged" />
+    </node>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="k4a_link" args="-0.18408162 -0.59068343 1.85925519 -0.00450478 0.9378159 -0.34707718 0.0042993 rgb_camera_link base_link" />
+    <arg name="filter_chain" default="$(find idmp_ros)/config/kinectFilterChain.yaml"/>
+
+    <node name="robot_filter" pkg="sensor_filters" type="pointcloud2_filter_chain" launch-prefix="bash -c 'sleep 1; $0 $@'" output="screen">
+        <rosparam command="load" file="$(arg filter_chain)" />
+        <remap from="~input" to="/filt_cld" />
+        <remap from="~output" to="points_filt" />
+    </node>
+    
+    <rosparam file="$(find idmp_ros)/config/params_live.yaml" />
+    <node pkg="idmp_ros" type="idmp" name="idmp_ros" output="screen" respawn="true"/>
+
+</launch>

@@ -5,7 +5,7 @@ Collaboration via Smooth Distance Fields". IDMP ROS package contains the Gaussia
 
 ## Installation
 
-See each package for dependencies and requirements before running the following.
+See each package for dependencies and requirements before running the following. Only tested in Noetic and ubuntu 20.04.
 
 ```
 mkdir -p idmp_ws/src
